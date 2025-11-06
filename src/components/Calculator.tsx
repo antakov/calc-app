@@ -1,5 +1,9 @@
-import { useMemo } from 'react';
+import {useCallback, useEffect, useMemo} from 'react';
 import './styles.css';
+import { useCalculator } from '../hooks/useCalculator';
+import type { Op } from '../hooks/useCalculator';
+
+type KeyHandlerMap = Partial<Record<string, () => void>>;
 
 type BtnKind = 'digit' | 'dot' | 'op' | 'func' | 'eq' | 'del' | 'clear' | 'sign' | 'percent';
 type BtnDef = {
@@ -13,7 +17,7 @@ type BtnDef = {
 
 const LAYOUT: BtnDef[][] = [
   [
-    { label: 'C', kind: 'clear', className: 'btn-func', ariaLabel: 'Clear' },
+    { label: 'AC', kind: 'clear', className: 'btn-func', ariaLabel: 'Clear' },
     { label: '+/-', kind: 'sign',  className: 'btn-func', ariaLabel: 'Toggle sign' },
     { label: '%', kind: 'percent', className: 'btn-func', ariaLabel: 'Percent' },
     { label: '÷', kind: 'op', value: '÷', className: 'btn-op', ariaLabel: 'Divide' },
@@ -45,6 +49,57 @@ const LAYOUT: BtnDef[][] = [
 ];
 
 export default function Calculator() {
+
+  const calc = useCalculator();
+
+  const onPress = useCallback((btn: BtnDef) => {
+    switch (btn.kind) {
+      case 'digit':   return calc.inputDigit(btn.value!);
+      case 'dot':     return calc.inputDot();
+      case 'op':      return calc.chooseOp(btn.value as Exclude<Op, null>);
+      case 'eq':      return calc.equals();
+      case 'del':     return calc.deleteLast();
+      case 'clear':   return calc.clearAll();
+      case 'sign':    return calc.toggleSign();
+      case 'percent': return calc.percent();
+    }
+  }, [calc]);
+
+  useEffect(() => {
+    const handlers: KeyHandlerMap = {
+      '.': () => calc.inputDot(),
+      Escape: () => calc.clearAll(),
+      Backspace: () => calc.deleteLast(),
+      Enter: () => calc.equals(),
+      '=': () => calc.equals(),
+      '+': () => calc.chooseOp('+'),
+      '-': () => calc.chooseOp('-'),
+      '*': () => calc.chooseOp('×'),
+      '/': () => calc.chooseOp('÷'),
+      '%': () => calc.percent(),
+      // digits
+      '0': () => calc.inputDigit('0'),
+      '1': () => calc.inputDigit('1'),
+      '2': () => calc.inputDigit('2'),
+      '3': () => calc.inputDigit('3'),
+      '4': () => calc.inputDigit('4'),
+      '5': () => calc.inputDigit('5'),
+      '6': () => calc.inputDigit('6'),
+      '7': () => calc.inputDigit('7'),
+      '8': () => calc.inputDigit('8'),
+      '9': () => calc.inputDigit('9'),
+    };
+
+    const onKey = (e: KeyboardEvent) => {
+      const h = handlers[e.key];
+      if (h) { e.preventDefault(); h(); }
+    };
+
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [calc]);
+
+
   const grid = useMemo(() => (
     <div className="grid">
       {LAYOUT.flatMap((row, rIdx) =>
@@ -52,7 +107,7 @@ export default function Calculator() {
           <button
             key={`${rIdx}-${cIdx}`}
             className={`btn ${btn.className ?? ''}`.trim()}
-            onClick={() => {}}
+            onClick={() => onPress(btn)}
             aria-label={btn.ariaLabel ?? btn.label}
             style={btn.colSpan ? { gridColumn: `span ${btn.colSpan}` } : {}}
           >
@@ -61,15 +116,17 @@ export default function Calculator() {
         ))
       )}
     </div>
-  ), []);
+  ), [onPress]);
 
   return (
     <div className="calc">
       <div className="display" aria-live="polite">
         <div className="mini">
-                    000
+          {calc.prev && (calc.operator as Op)
+            ? `${calc.prev} ${calc.operator}`
+            : '\u00A0'}
         </div>
-        <div className="main">000</div>
+        <div className="main">{calc.current}</div>
       </div>
       {grid}
     </div>
