@@ -1,0 +1,166 @@
+/* ===== iOS-like Calculator Styles ===== */
+
+:root {
+    --bg: #0b0b0f;
+    --panel: #1b1c20;
+    --display-bg: #000000;
+    --text: #f2f2f2;
+    --muted: #a5a5a7;
+
+    --btn-digit-bg: #2c2d31;
+    --btn-func-bg: #a5a5a7;
+    --btn-op-bg:   #fe9f0a;
+    --btn-eq-bg:   #fe9f0a;
+
+    --btn-digit-fg: #f2f2f2;
+    --btn-func-fg:  #000000;
+    --btn-op-fg:    #ffffff;
+
+    --border: rgba(255,255,255,0.06);
+    --shadow-1: 0 8px 20px rgba(0,0,0,.35);
+    --shadow-press: inset 0 2px 6px rgba(0,0,0,.5);
+
+    --radius-panel: 24px;
+    --btn-size: 68px;
+    --gap: 12px;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", Roboto, Segoe UI, Arial, system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --bg: #efeff4;
+        --panel: #ffffff;
+        --display-bg: #f7f7f9;
+        --text: #0b0b0f;
+        --muted: #6b6b6f;
+
+        --btn-digit-bg: #e7e7ea;
+        --btn-func-bg:  #cfcfd3;
+        --btn-op-bg:    #ff9500;
+        --btn-eq-bg:    #ff9500;
+
+        --btn-digit-fg: #0b0b0f;
+        --btn-func-fg:  #0b0b0f;
+        --btn-op-fg:    #ffffff;
+
+        --border: rgba(0,0,0,0.08);
+    }
+}
+
+body {
+    margin: 0;
+    background:
+            radial-gradient(1200px 800px at 70% -10%, rgba(255,255,255,0.06), transparent 60%),
+            var(--bg);
+    font-family: var(--font);
+    color: var(--text);
+}
+
+.calc {
+    width: min(380px, 92vw);
+    margin: 48px auto;
+    padding: 16px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-panel);
+    box-shadow: var(--shadow-1);
+}
+
+.display {
+    background: var(--display-bg);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+}
+
+.display .mini {
+    min-height: 18px;
+    color: var(--muted);
+    font-size: 13px;
+    text-align: right;
+    letter-spacing: .2px;
+}
+
+.display .main {
+    font-variant-numeric: tabular-nums;
+    font-size: 44px;
+    font-weight: 700;
+    text-align: right;
+    line-height: 1.25;
+    padding-top: 2px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--gap);
+    align-items: center;
+    justify-items: center;
+}
+
+.btn {
+    width: var(--btn-size);
+    height: var(--btn-size);
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1;
+    background: var(--btn-digit-bg);
+    color: var(--btn-digit-fg);
+    cursor: pointer;
+    user-select: none;
+}
+
+.btn-func {
+    background: var(--btn-func-bg);
+    color: var(--btn-func-fg);
+}
+
+.btn-op,
+.btn-eq {
+    background: var(--btn-op-bg);
+    color: var(--btn-op-fg);
+    border-color: transparent;
+}
+
+.btn:hover { filter: brightness(1.08); }
+.btn:active {
+    transform: translateY(1px) scale(0.99);
+    box-shadow: var(--shadow-press);
+}
+
+.btn:focus { outline: none; }
+.btn:focus:not(:focus-visible) { outline: none; }
+
+.btn:focus-visible {
+    outline: 2px solid #4b5563;
+    outline-offset: 2px;
+}
+
+.btn {
+    -webkit-tap-highlight-color: rgba(75, 85, 99, 0.2);
+}
+
+
+.btn.wide {
+    width: calc(var(--btn-size) * 2 + var(--gap));
+    grid-column: span 2;
+    justify-self: stretch;
+}
+
+@media (max-width: 360px) {
+    :root { --btn-size: 60px; }
+    .display .main { font-size: 38px; }
+}
+
+.btn:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.6);
+    outline-offset: 2px;
+}
+
+.btn-op, .btn-eq { letter-spacing: .2px; }
