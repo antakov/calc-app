@@ -1,9 +1,9 @@
 import './App.css'
-import Calculator from "./components/Calculator.tsx";
+import Calculator from './components/Calculator.tsx';
 
 function App() {
   return (
-     <Calculator/>
+    <Calculator/>
   )
 }
 
